@@ -62,14 +62,14 @@ Optimizer: Adam | Loss: sparse categorical cross-entropy
 
 ### Notebooks (Edge-IIoTset)
 
-| Notebook | Clients | Data dist. | Corrupted clients | Selection |
-| --- | --- | --- | --- | --- |
-| `MPC-DNN-IID-5c-urpc.ipynb` | 5 | IID | 0 (1 unresponsive per round) | None |
-| `MPC-DNN-IID-wp-3cc-ws.ipynb` | 10 | IID | 3 | Yes |
-| `MPC-DNN-NonIID-wp-4cc-wos.ipynb` | 10 | Non-IID (warm-up) | 4 | No |
-| `MPC-DNN-NonIID-wp-4cc-ws.ipynb` | 10 | Non-IID (warm-up) | 4 | Yes |
-| `MPC-DNN-Noniid-test1.ipynb` | 10 | Non-IID (pure) | 0 | No |
-| `central2.ipynb` | — | Centralized baseline | — | — |
+| Notebook | Description |
+| --- | --- |
+| `MPC-DNN-IID-5c-urpc.ipynb` | SMPC-enabled FL using a DNN client model on IID data. Simulates 5 clients with one unresponsive client at every communication round. No client selection. |
+| `MPC-DNN-IID-wp-3cc-ws.ipynb` | SMPC-enabled FL with 10 IID clients, including 3 corrupted clients. Implements client selection at each round to mitigate adversarial impact. |
+| `MPC-DNN-NonIID-wp-4cc-wos.ipynb` | SMPC-enabled FL with 10 non-IID (warm-up) clients, including 4 corrupted clients. No client selection is applied. |
+| `MPC-DNN-NonIID-wp-4cc-ws.ipynb` | SMPC-enabled FL with 10 non-IID (warm-up) clients, including 4 corrupted clients. Implements client selection to defend against malicious updates. |
+| `MPC-DNN-Noniid-test1.ipynb` | SMPC-enabled FL with 10 non-IID (pure) clients. No corrupted clients. No selection strategy is used. Serves as a baseline for non-IID without warm-up. |
+| `central2.ipynb` | Centralized training of the DNN model for performance comparison with federated variants. All data is aggregated and trained centrally. |
 
 ---
 
