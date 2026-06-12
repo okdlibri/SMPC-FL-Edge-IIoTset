@@ -1,7 +1,12 @@
 # SMPC-FL-Edge-IIoTset
 
-Secure Multiparty Computation (SMPC)-enabled Federated Learning for IoT intrusion detection using the TON_IOT dataset.
+Secure Multiparty Computation (SMPC)-enabled Federated Learning for IoT intrusion detection.
 This repository contains the full experimental code, configuration files, and result artifacts accompanying our paper.
+
+Two datasets are evaluated independently:
+
+- **Edge-IIoTset** — root-level notebooks
+- **TON_IOT** — `TON_IOT/` subfolder
 
 ## Overview
 
@@ -17,25 +22,67 @@ Key properties of the framework:
 - **Robustness experiments** — a subset of clients can be assigned shuffled labels to simulate label-noise or Byzantine attacks.
 - **Best-round selection on validation only** — the global model checkpoint with the highest validation macro-F1 is kept; the test set is evaluated exactly once after selection.
 
-## Dataset
+---
 
-All experiments use the **TON_IOT** network intrusion dataset.
+## Dataset 1 — Edge-IIoTset
+
+Used by all root-level notebooks.
 
 | Property | Value |
 | --- | --- |
-| Total records (raw) | ~211 000 |
+| Total records (raw) | ~1 909 671 |
+| Feature columns (after preprocessing) | 91 |
+| Target task | 15-class multiclass classification |
+| Classes | `Normal`, `DDoS_UDP`, `DDoS_ICMP`, `DDoS_TCP`, `DDoS_HTTP`, `SQL_injection`, `Vulnerability_scanner`, `Password`, `Uploading`, `Backdoor`, `Port_Scanning`, `XSS`, `Ransomware`, `Fingerprinting`, `MITM` |
+| Class-balance strategy | Hybrid resample — minority classes upsampled to 9 689 examples |
+| Data partitioning | Stratified IID (StratifiedKFold) |
+
+Place the preprocessed file as `preprocessed_DNN.csv` in the root directory before running these notebooks.
+
+### Model Architecture (Edge-IIoTset)
+
+```text
+Input (91)
+  → Dense(90) + ReLU + L2(0.01)
+  → Dense(90) + ReLU + L2(0.01)
+  → Dense(15) + Softmax
+```
+
+Optimizer: Adam | Loss: sparse categorical cross-entropy
+
+### Notebooks (Edge-IIoTset)
+
+| Notebook | Clients | Data dist. | Corrupted clients | Selection |
+| --- | --- | --- | --- | --- |
+| `MPC-DNN-IID-5c-urpc.ipynb` | 5 | IID | 0 (1 unresponsive per round) | None |
+| `MPC-DNN-IID-wp-3cc-ws.ipynb` | 10 | IID | 3 | Yes |
+| `MPC-DNN-NonIID-wp-4cc-wos.ipynb` | 10 | Non-IID (warm-up) | 4 | No |
+| `MPC-DNN-NonIID-wp-4cc-ws.ipynb` | 10 | Non-IID (warm-up) | 4 | Yes |
+| `MPC-DNN-Noniid-test1.ipynb` | 10 | Non-IID (pure) | 0 | No |
+| `central2.ipynb` | — | Centralized baseline | — | — |
+
+---
+
+## Dataset 2 — TON_IOT
+
+Used exclusively by the `TON_IOT/` subfolder.
+
+| Property | Value |
+| --- | --- |
+| Total records (raw) | ~211 043 |
 | Feature columns (after preprocessing) | 113 |
 | Target task | 10-class multiclass classification |
 | Classes | `backdoor`, `ddos`, `dos`, `injection`, `mitm`, `normal`, `password`, `ransomware`, `scanning`, `xss` |
 | Class-balance strategy | Resample each training class to 15 000 examples; validation and test splits kept at original distribution |
+| Data partitioning | Constrained Dirichlet non-IID (α = 0.7) |
 | Train / Val / Test split | 70 / 15 / 15 (stratified) |
 
 The dataset is available from the University of New South Wales:
 [https://research.unsw.edu.au/projects/toniot-datasets](https://research.unsw.edu.au/projects/toniot-datasets)
 
-Place the file as `TON_IOT/train_test_network.csv` (or `TON_IOT/data.csv`) before running the notebooks.
+Place the file as `TON_IOT/train_test_network.csv` before running the TON_IOT notebook.
 
-## Model Architecture
+### Model Architecture (TON_IOT)
 
 ```text
 Input (113)
@@ -49,21 +96,13 @@ Optimizer: Adam (lr = 5 × 10⁻⁴, gradient clip norm = 1.0)
 Regularization: L2 weight decay (1 × 10⁻⁴) on all Dense layers  
 Total parameters: 72 522 (71 754 trainable)
 
-## Experiments
-
-### Notebook Descriptions
+### Notebook (TON_IOT)
 
 | Notebook | Clients | Data dist. | Corrupted clients | Selection |
 | --- | --- | --- | --- | --- |
 | `TON_IOT/notebook.ipynb` | 5 or 10 | Non-IID (Dirichlet α=0.7) | Configurable | Validation-aware |
-| `MPC-DNN-IID-5c-urpc.ipynb` | 5 | IID | 0 (1 unresponsive) | None |
-| `MPC-DNN-IID-wp-3cc-ws.ipynb` | 10 | IID | 3 | Yes |
-| `MPC-DNN-NonIID-wp-4cc-wos.ipynb` | 10 | Non-IID (warm-up) | 4 | No |
-| `MPC-DNN-NonIID-wp-4cc-ws.ipynb` | 10 | Non-IID (warm-up) | 4 | Yes |
-| `MPC-DNN-Noniid-test1.ipynb` | 10 | Non-IID (pure) | 0 | No |
-| `central2.ipynb` | — | Centralized | — | — |
 
-### Configuration Highlights
+### Configuration Highlights (TON_IOT)
 
 | Parameter | Value |
 | --- | --- |
@@ -73,11 +112,13 @@ Total parameters: 72 522 (71 754 trainable)
 | Dirichlet α | 0.7 |
 | Min samples per class per client | 500 |
 | Noise scale (SMPC mask) | 1 × 10⁻⁴ |
-| Validation accuracy threshold | 0.25 (multiclass) |
+| Validation accuracy threshold | 0.25 |
+
+---
 
 ## Results
 
-Results are stored under `TON_IOT/results_<clients>clients<config>/`.  
+TON_IOT result artifacts are stored under `TON_IOT/results_<clients>clients<config>/`.  
 Each folder contains:
 
 ```text
@@ -93,7 +134,7 @@ Each folder contains:
     └── best_global_model.keras
 ```
 
-### Sample Results (TON_IOT, 5 clients, α=0.7)
+### Sample Results — TON_IOT, 5 clients, α=0.7
 
 #### Clean setting (no corrupted clients)
 
@@ -119,6 +160,8 @@ Each folder contains:
 | Macro F1 | 0.783 |
 | Weighted F1 | 0.856 |
 
+---
+
 ## Requirements
 
 ```text
@@ -142,50 +185,57 @@ pip install tensorflow scikit-learn imbalanced-learn numpy pandas matplotlib sea
 GPU training was used for all reported results (TensorFlow 2.10, CUDA 11).
 CPU execution is supported but will be significantly slower.
 
+---
+
 ## Reproducing the Experiments
 
-1. **Download the dataset** and place it at `TON_IOT/train_test_network.csv`.
+### Edge-IIoTset
 
-2. **Open the main notebook** `TON_IOT/notebook.ipynb` in Jupyter.
+1. Place `preprocessed_DNN.csv` in the root directory.
+2. Open the desired notebook (e.g., `MPC-DNN-IID-5c-urpc.ipynb`) in Jupyter.
+3. Run all cells.
 
-3. **Set the configuration** at the top of the notebook:
+### TON_IOT
+
+1. Place `train_test_network.csv` in the `TON_IOT/` directory.
+2. Open `TON_IOT/notebook.ipynb` in Jupyter.
+3. Set the configuration at the top:
 
    ```python
    EXPERIMENT_MODE = "clean"   # or "robust"
-   NUM_CLIENTS    = 5          # or 10
+   NUM_CLIENTS     = 5         # or 10
    DIRICHLET_ALPHA = 0.7
-   FAST_RUN       = False      # True for a quick smoke-test only
+   FAST_RUN        = False     # True for a quick smoke-test only
    ```
 
-4. **Run all cells.** Artifacts are written to `TON_IOT/<run_name>/`.
-
-5. For the IID and warm-up non-IID variants, open the corresponding notebook from the table above and run all cells.
-
-6. For the centralized baseline, open `central2.ipynb` and run all cells.
+4. Run all cells. Artifacts are written to `TON_IOT/<run_name>/`.
 
 > **Reporting note:** Run at least three random seeds and report mean ± std.
 > Compare against standard FedAvg under the identical partition.
 > Do not tune any hyperparameter using test-set performance.
 
+---
+
 ## Repository Structure
 
 ```text
 SMPC-FL-Edge-IIoTset/
-├── TON_IOT/
-│   ├── notebook.ipynb                        # Main optimized experiment
-│   ├── results_5clients-alpha0.7/
-│   │   ├── clean/mpc_dnn/                    # 5-client clean results
-│   │   └── robust/mpc_dnn/                   # 5-client robust results
-│   └── results_10clients_alpha0.7/
-│       └── seed_*/clean|robust/mpc_dnn/       # 10-client results (multiple seeds)
+│
+│   # Edge-IIoTset experiments
 ├── MPC-DNN-IID-5c-urpc.ipynb
 ├── MPC-DNN-IID-wp-3cc-ws.ipynb
 ├── MPC-DNN-NonIID-wp-4cc-wos.ipynb
 ├── MPC-DNN-NonIID-wp-4cc-ws.ipynb
 ├── MPC-DNN-Noniid-test1.ipynb
 ├── central2.ipynb
-└── README.md
+│
+│   # TON_IOT experiments
+└── TON_IOT/
+    ├── notebook.ipynb
+    └── results_*/                  # Experiment configs and figures
 ```
+
+---
 
 ## Citation
 
