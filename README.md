@@ -1,5 +1,11 @@
 # SMPC-FL-Edge-IIoTset
 
+> **Towards Robust and Privacy-Preserving Federated Learning: SMPC-Enhanced Defense and Optimization for Edge-IIoTset**  
+> Omar Dib · Shiyun Li · Zhengkun Li  
+> *Submitted to [Internet of Things](https://www.sciencedirect.com/journal/internet-of-things) (Elsevier)*
+
+---
+
 Secure Multiparty Computation (SMPC)-enabled Federated Learning for IoT intrusion detection.
 This repository contains the full experimental code, configuration files, and result artifacts accompanying our paper.
 
@@ -14,7 +20,11 @@ Traditional Federated Learning aggregates model updates on a central server, exp
 This work integrates **Secure Multiparty Computation** into the aggregation step so the server never sees any client's raw weights.
 Each client masks its update with pairwise noise before sending; the noise cancels during aggregation, leaving only the correctly weighted average.
 
-Key properties of the framework:
+## Framework Architecture
+
+![Framework architecture](fig-architecture.png)
+
+## Key Properties
 
 - **Privacy-preserving aggregation** — pairwise noise masks cancel at the server; no raw weights are revealed.
 - **Validation-aware client selection** — clients whose local models fail a shared validation check are excluded before aggregation.
@@ -239,12 +249,14 @@ SMPC-FL-Edge-IIoTset/
 
 ## Citation
 
-<!-- TODO: Replace with your full citation once the paper is published -->
+<!-- TODO: Update with volume/pages/DOI once published -->
 ```bibtex
-@article{yourkey,
-  title   = {Your Paper Title},
-  author  = {Author One and Author Two and Author Three},
-  journal = {Journal / Conference Name},
+@article{dib2025smpcfl,
+  title   = {Towards Robust and Privacy-Preserving Federated Learning:
+             SMPC-Enhanced Defense and Optimization for Edge-IIoTset},
+  author  = {Dib, Omar and Li, Shiyun and Li, Zhengkun},
+  journal = {Internet of Things},
+  publisher = {Elsevier},
   year    = {2025},
 }
 ```
