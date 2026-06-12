@@ -1,0 +1,43 @@
+{
+  "algorithm": "mpc_dnn",
+  "seed": 1,
+  "target_mode": "multiclass",
+  "experiment_mode": "robust",
+  "num_clients": 10,
+  "dirichlet_alpha": 0.1,
+  "min_samples_per_class_per_client": 500,
+  "share_pct": 0.05,
+  "share_fraction": 0.5,
+  "corrupt_clients": [
+    0,
+    1,
+    3,
+    7
+  ],
+  "corruption_rate": 1.0,
+  "num_rounds": 15,
+  "epochs": 4,
+  "batch_size": 512,
+  "learning_rate": 0.0005,
+  "noise_scale": 0.0001,
+  "validation_threshold": 0.25,
+  "fedprox_mu": 0.01,
+  "samples_per_class": 15000,
+  "best_round": 12,
+  "train_samples": 150000,
+  "validation_samples": 31656,
+  "test_samples": 31657,
+  "input_dim": 113,
+  "classes": [
+    "backdoor",
+    "ddos",
+    "dos",
+    "injection",
+    "mitm",
+    "normal",
+    "password",
+    "ransomware",
+    "scanning",
+    "xss"
+  ]
+}
